@@ -29,21 +29,21 @@ create table Branch(
 	branchID int primary key auto_increment,
     branchLocationID int,
     branchName varchar(50) default "Main Branch",
-    foreign key(branchLocationID)  references Address(addressID)
+    foreign key(branchLocationID)  references Address(addressID) on delete cascade
 );
  
 create table Program (
 	programID int auto_increment primary key,
     departmentOfferingID int,
     programName varchar(100),
-    foreign key (departmentOfferingID)  references Department(departmentID)
+    foreign key (departmentOfferingID)  references Department(departmentID) on delete cascade
 );
 
 create table Room (
 	roomID int primary key auto_increment,
     capacity int,
     victimTypesContained varchar(30),
-    num_victimsAccommodated int,
+    num_victimsAccommodatd int,
     check(num_victimsAccommodated <= capacity)
 );
 
@@ -53,9 +53,9 @@ create table Staff(
     branchBasedID int,
     email varchar(100) , 
     Primary_Tel_Num varchar (15),
-    foreign key(staffID)  references Person(personID),
-    foreign key(departmentID)  references Department(departmentID),
-    foreign key(branchBasedID)  references Branch(branchID),
+    foreign key(staffID)  references Person(personID) on delete cascade,
+    foreign key(departmentID)  references Department(departmentID) on delete cascade,
+    foreign key(branchBasedID)  references Branch(branchID) on delete cascade,
     check ( email like "%__@__%")
 );
 
@@ -64,8 +64,8 @@ create table Refugee (
     roomID int,
     homeCountry varchar(40),
     countryIssue varchar(100),
-    foreign key(refugeeID)  references Person(personID),
-	foreign key(roomID) references Room(roomID)
+    foreign key(refugeeID)  references Person(personID) on delete cascade,
+	foreign key(roomID) references Room(roomID) on delete cascade
 );
 
 create table Patient (
@@ -73,8 +73,8 @@ create table Patient (
     roomID int,
     illnessStatus varchar (30),
     pastHospitalName varchar (80),
-    foreign key(patientID)  references Person(personID),
-	foreign key(roomID) references Room(roomID)
+    foreign key(patientID)  references Person(personID) on delete cascade,
+	foreign key(roomID) references Room(roomID) on delete cascade
 );
 
 create table Visitor (
@@ -83,8 +83,8 @@ create table Visitor (
     dateVisited date,
     arrivalTime time,
     departureTime time,
-    foreign key(patientVisitedID)  references Patient (patientID),
-    foreign key(visitorID)  references Person (personID)
+    foreign key(patientVisitedID)  references Patient (patientID) on delete cascade,
+    foreign key(visitorID)  references Person (personID) on delete cascade
 );
 
 --  WEAK ENTITIES
@@ -92,8 +92,8 @@ create table Visitor (
 create table Staff_Program (
 	staffID varchar(10),
     programID int,
-    foreign key(staffID) references Staff(staffID),
-    foreign key(programID) references Program(programID)
+    foreign key(staffID) references Staff(staffID) on delete cascade,
+    foreign key(programID) references Program(programID) on delete cascade
 );
 
 create table Refugee_Program (
@@ -113,22 +113,22 @@ create table Patient_Program (
 create table Patient_Visitor (
 	patientID varchar(10),
     visitorID varchar(10),
-    foreign key(patientID) references Patient(patientID),
-    foreign key(visitorID) references Visitor(visitorID)
+    foreign key(patientID) references Patient(patientID) on delete cascade,
+    foreign key(visitorID) references Visitor(visitorID) on delete cascade
 );
 
 create table healthRecord (
 	patientID varchar(10),
     diagnosedOf varchar(50),
     bloodGroup char(2),
-    foreign key(patientID) references Patient(patientID)
+    foreign key(patientID) references Patient(patientID) on delete cascade
 );
 
 -- TABLES POPULATION
 
 -- INSERTION INTO THE PERSON TABLE FOR THE DIFFERENT PERSON GROUP
 
--- INSERTION A PERSON STAFF
+-- INSERTION OF A PERSON STAFF
 insert into Person values
 ("S001","Rancho","Shamaldass","Male","1992-03-10"),
 ("S002","Chanchad","Samar","Male","1989-01-08"),
@@ -280,3 +280,21 @@ insert into healthRecord values
 ("P003", "Chronic obstructive pulmonary disease", "AB"),
 ("P004", "Trachea, bronchus, and lung cancers", "AB"),
 ("P005", "Alzheimer’s disease", "O");
+
+
+-- CREATING INDEXES
+create index programs on Program (programName);
+
+create index refugee on Refugee (programName);
+
+
+
+select * from Person;
+
+-- QUESRIES
+
+-- This query helps to retieve the information of all the programs run for 
+-- both the patients and th refugees in recovering and gaining stability in their own way
+
+
+
