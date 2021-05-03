@@ -7,6 +7,7 @@ create table Person(
     fname varchar(40),
     lname varchar(40),
     gender enum("Male","Female","Others"),
+    personType enum("Staff", "Visitor", "Patient","Refugee"),
     dateOfBirth date
 );
 
@@ -44,7 +45,7 @@ create table Room (
     capacity int,
     victimTypesContained varchar(30),
     num_victimsAccommodatd int,
-    check(num_victimsAccommodated <= capacity)
+    check(num_victimsAccommodatd <= capacity)
 );
 
 create table Staff(
@@ -81,7 +82,7 @@ create table Visitor (
 	visitorID varchar(10) primary key,
     patientVisitedID varchar(10),
     dateVisited date,
-		time,
+	arrivalTime	time,
     departureTime time,
     foreign key(patientVisitedID)  references Patient (patientID) on delete cascade,
     foreign key(visitorID)  references Person (personID) on delete cascade
@@ -130,36 +131,36 @@ create table healthRecord (
 
 -- INSERTION OF A PERSON STAFF
 insert into Person values
-("S001","Rancho","Shamaldass","Male","1992-03-10"),
-("S002","Chanchad","Samar","Male","1989-01-08"),
-("S003","Rohit","Anjali","Female","1995-11-14"),
-("S004","Mustapha","Amar","Male","1992-03-10"),
-("S005","Veer","Zaara","Female","1993-12-20");
+("S001","Rancho","Shamaldass","Male", "Staff","1992-03-10"),
+("S002","Chanchad","Samar","Male", "Staff","1989-01-08"),
+("S003","Rohit","Anjali","Female", "Staff","1995-11-14"),
+("S004","Mustapha","Amar","Male", "Staff","1992-03-10"),
+("S005","Veer","Zaara","Female", "Staff","1993-12-20");
 
 -- INSERTION A PERSON VISITOR
 insert into Person values
-("V001","Aman","Sharma","Male","1999-03-13"),
-("V002","George","Rhea","Female","1990-11-08"),
-("V003","Salman","Khan","Male","1983-11-14"),
-("V004","Sharukh","Khan","Male","1982-03-10"),
-("V005","Sana","Dharma","Female","1995-02-20");
+("V001","Aman","Sharma","Male", "Visitor","1999-03-13"),
+("V002","George","Rhea","Female", "Visitor","1990-11-08"),
+("V003","Salman","Khan","Male", "Visitor","1983-11-14"),
+("V004","Sharukh","Khan","Male", "Visitor","1982-03-10"),
+("V005","Sana","Dharma","Female", "Visitor","1995-02-20");
 
 -- INSERTION A PERSON PATIENT
 insert into Person values
-("P001","Aman","Sharman","Male","1970-12-10"),
-("P002","Kajol","Salman","Female","1986-11-28"),
-("P003","Dave","Kaali","Male","1985-11-14"),
-("P004","Sana","Kubur","Female","1970-03-02"),
-("P005","Pryanka","Kadr","Female","1983-09-30");
+("P001","Aman","Sharman","Male", "Patient","1970-12-10"),
+("P002","Kajol","Salman","Female", "Patient","1986-11-28"),
+("P003","Dave","Kaali","Male", "Patient","1985-11-14"),
+("P004","Sana","Kubur","Female", "Patient","1970-03-02"),
+("P005","Pryanka","Kadr","Female", "Patient","1983-09-30");
 
 
 -- INSERTION A PERSON REFUGEE
 insert into Person values
-("R001","Khna","Jamaldeen","Male","1984-03-04"),
-("R002","Sara","Timothy","Female","1970-01-07"),
-("R003","Karl","Desmond","Male","1995-11-14"),
-("R004","Path","Conor","Female","1984-03-17"),
-("R005","Veer","Singh","Male","1973-10-19");
+("R001","Khna","Jamaldeen","Male", "Refugee","1984-03-04"),
+("R002","Sara","Timothy","Female", "Refugee","1970-01-07"),
+("R003","Karl","Desmond","Male", "Refugee","1995-11-14"),
+("R004","Path","Conor","Female", "Refugee","1984-03-17"),
+("R005","Veer","Singh","Male", "Refugee","1973-10-19");
 
 
 -- INSERTION INTO DEPARTMENT TABLE
@@ -199,7 +200,7 @@ insert into Branch(branchLocationID, branchName) values
 (5, "Rohingya-Yamethin-Branch");
 
 -- INSERTION INTO ROOM TABLE
-insert into Room (capacity, victimTypesContained, num_victimsAccommodated) values
+insert into Room (capacity, victimTypesContained, num_victimsAccommodatd) values
 (10, "Patients", 8),
 (30, "Refugees", 29),
 (25, "Refugees", 25),
@@ -285,8 +286,6 @@ insert into healthRecord values
 -- CREATING INDEXES
 create index programs on Program (programName);
 
-create index refugee on Refugee (programName);
-
 create index patientCondition on Patient (illnessStatus);
 
 -- QUERY ONE
@@ -328,4 +327,13 @@ where illnessStatus in (
 
 
 -- QUERY FIVE
+select lname, fname, gender, branchName, departmentName, Staff.staffID, count(distinct Staff_Program.staffID, Staff_Program.programID) as 
+"Number of Programs Allocated to Staff" 
+from
+(Staff inner join Person on Person.personID = Staff.staffID inner join Branch on Staff.branchBasedID = Branch.branchID inner join 
+Department on Staff.departmentID = Department.departmentID) join Staff_Program on Staff_Program.staffID = Staff.staffID left join 
+Program on Program.programID = Staff_Program.programID group by Staff_program.staffID;
 
+
+-- QUERY SIX
+select * from Person;
