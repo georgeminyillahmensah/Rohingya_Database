@@ -81,7 +81,7 @@ create table Visitor (
 	visitorID varchar(10) primary key,
     patientVisitedID varchar(10),
     dateVisited date,
-    arrivalTime time,
+		time,
     departureTime time,
     foreign key(patientVisitedID)  references Patient (patientID) on delete cascade,
     foreign key(visitorID)  references Person (personID) on delete cascade
@@ -287,14 +287,45 @@ create index programs on Program (programName);
 
 create index refugee on Refugee (programName);
 
+create index patientCondition on Patient (illnessStatus);
+
+-- QUERY ONE
+-- INFORMATION ABOUT ALL REFUGEES
+select Person.personID as "refugeeID", Room.roomID, Person.lname as "last name", Person.fname as "first name", Person.dateOfBirth,
+	Person.gender, Refugee.homeCountry, Refugee.countryIssue
+	from (Person join Refugee on Person.personID = Refugee.refugeeID)
+	join Room on Room.roomID = Refugee.roomID
+order by Refugee.homeCountry;
+
+-- QUERY TWO
+-- INFORMATION ABOUT ALL PATIENTS
+select Person.personID as "patient Identifier", Person.lname as "last name",
+Person.fname as "first name",  Room.roomID, Room.victimTypesContained as "In With", Person.dateOfBirth, Person.gender, Patient.pastHospitalName, 
+healthRecord.bloodGroup, healthRecord.diagnosedOf, Patient.illnessStatus
+from (Person join Patient on Person.personID = Patient.patientID join healthRecord on Patient.patientID = healthRecord.patientID)
+join Room on Room.roomID = Patient.roomID
+where Patient.illnessStatus IN ("critical condition", "mild condition")
+order by Patient.pastHospitalName desc;
+
+-- QUERY THREE
+
+select  Department.departmentID, Department.departmentName, Program.programID, Program.programName as "Program Name" ,
+	(count(Patient_Program.ProgramID) + count(Refugee_Program.refugeeID)) as "Number of Victims Taking Program" from 
+	(Program left join Refugee_Program on Program.programID = Refugee_Program.programID join Department on
+	Program.departmentOfferingID = Department.departmentID) left join Patient_Program on 
+	Patient_Program.programID = Program.programID
+	where "Number of Victims Taking Program" <= 5 and "Program Name" not like "Gidance%"
+group by Program.programName order by Program.programID ;
 
 
-select * from Person;
+-- QUERY FOUR
+select Person.lname, Person.fname, Visitor.visitorID, dateVisited, arrivalTime, departureTime from Person 
+inner join Visitor on Person.personID = Visitor.patientVisitedID inner join Patient on Person.personID = Patient.patientID
+where illnessStatus in (
+	select illnessStatus from Patient 
+    where illnessStatus = "critical condition"
+);
 
--- QUESRIES
 
--- This query helps to retieve the information of all the programs run for 
--- both the patients and th refugees in recovering and gaining stability in their own way
-
-
+-- QUERY FIVE
 
