@@ -336,4 +336,6 @@ Program on Program.programID = Staff_Program.programID group by Staff_program.st
 
 
 -- QUERY SIX
-select * from Person;
+select distinct personType as "People", count(personID) as "Number"
+from Person where personType != "Staff" 
+group by personType;
