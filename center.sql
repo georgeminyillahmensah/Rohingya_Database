@@ -1,7 +1,11 @@
-create database Rohingya_Rehabilitation_Center;
+create database Rohingya_Rehabilitation_Center_50642023;
+use Rohingya_Rehabilitation_Center_50642023;
 
-use Rohingya_Rehabilitation_Center;
-
+-- CREATING THE PERSON GENERALIZED CLASS
+-- I used a varchar for this tale because, there are different person groups under the person
+-- their keys are to be distinguised from each other. For example, a staff under this table should not have  
+-- his or her ID following the same pattern as a Visitor. There using a varchar made it possible to specify the 
+-- distinction like "V0001" for a viitor and "S0001" or a staff
 create table Person(
 	personID varchar(10) primary key,
     fname varchar(40),
@@ -11,6 +15,7 @@ create table Person(
     dateOfBirth date
 );
 
+-- CREATING THE DEPARTMENT TABLE
 create table Department(
 	departmentID int primary key auto_increment,
     departmentName varchar(50) default "HealthCare and Safety"
@@ -25,7 +30,7 @@ create table Address(
     street varchar(50),
     landmark varchar(50)
 );
-
+-- CREATING THE BRANCH TABLE
 create table Branch(
 	branchID int primary key auto_increment,
     branchLocationID int,
@@ -33,6 +38,7 @@ create table Branch(
     foreign key(branchLocationID)  references Address(addressID) on delete cascade
 );
  
+ -- CREATING THE PROGRAM TABLE
 create table Program (
 	programID int auto_increment primary key,
     departmentOfferingID int,
@@ -40,6 +46,7 @@ create table Program (
     foreign key (departmentOfferingID)  references Department(departmentID) on delete cascade
 );
 
+-- CREATING THE ROOM TABLE
 create table Room (
 	roomID int primary key auto_increment,
     capacity int,
@@ -48,6 +55,7 @@ create table Room (
     check(num_victimsAccommodatd <= capacity)
 );
 
+-- CREATING THE STAFF TABLE
 create table Staff(
 	staffID varchar(10) primary key,
     departmentID int,
@@ -60,6 +68,7 @@ create table Staff(
     check ( email like "%__@__%")
 );
 
+-- CREATING THE REFUGEE TABLE
 create table Refugee (
 	refugeeID varchar(10) primary key,
     roomID int,
@@ -69,6 +78,7 @@ create table Refugee (
 	foreign key(roomID) references Room(roomID) on delete cascade
 );
 
+-- CREATING THE PATIENT TABLE
 create table Patient (
 	patientID varchar(10) primary key,
     roomID int,
@@ -78,6 +88,7 @@ create table Patient (
 	foreign key(roomID) references Room(roomID) on delete cascade
 );
 
+-- CREATING THE VISITOR TABLE
 create table Visitor (
 	visitorID varchar(10) primary key,
     patientVisitedID varchar(10),
@@ -90,6 +101,7 @@ create table Visitor (
 
 --  WEAK ENTITIES
 
+-- CREATING THE STAFF_PROGRAM TABLE
 create table Staff_Program (
 	staffID varchar(10),
     programID int,
@@ -97,6 +109,7 @@ create table Staff_Program (
     foreign key(programID) references Program(programID) on delete cascade
 );
 
+-- CREATING THE REFUGEE_PROGRAM TABLE
 create table Refugee_Program (
 	RefugeeID varchar(10),
     programID int,
@@ -104,6 +117,7 @@ create table Refugee_Program (
     foreign key(programID) references Program(programID)
 );
 
+-- CREATING THE PATIENT_PROGRAM TABLE
 create table Patient_Program (
 	PatientID varchar(10),
     programID int,
@@ -111,6 +125,7 @@ create table Patient_Program (
     foreign key(programID) references Program(programID)
 );
 
+-- CREATING THE PATIENT_VISITOR TABLE
 create table Patient_Visitor (
 	patientID varchar(10),
     visitorID varchar(10),
@@ -118,6 +133,7 @@ create table Patient_Visitor (
     foreign key(visitorID) references Visitor(visitorID) on delete cascade
 );
 
+-- CREATING THE HEALTH RECORD TABLE
 create table healthRecord (
 	patientID varchar(10),
     diagnosedOf varchar(50),
@@ -127,8 +143,7 @@ create table healthRecord (
 
 -- TABLES POPULATION
 
--- INSERTION INTO THE PERSON TABLE FOR THE DIFFERENT PERSON GROUP
-
+-- INSERTION INTO THE PERSON TABLE FOR THE DIFFERENT PERSON GROUPS
 -- INSERTION OF A PERSON STAFF
 insert into Person values
 ("S001","Rancho","Shamaldass","Male", "Staff","1992-03-10"),
@@ -160,7 +175,10 @@ insert into Person values
 ("R002","Sara","Timothy","Female", "Refugee","1970-01-07"),
 ("R003","Karl","Desmond","Male", "Refugee","1995-11-14"),
 ("R004","Path","Conor","Female", "Refugee","1984-03-17"),
-("R005","Veer","Singh","Male", "Refugee","1973-10-19");
+("R005","Veer","Singh","Male", "Refugee","1973-10-19"),
+("R006","Anjali","Sharma","Female", "Refugee","1977-11-09"),
+("R007","Farhan","Khrishna","Male", "Refugee","1983-03-15"),
+("R008","Moo","Dhorma","Female", "Refugee","1993-10-28");
 
 
 -- INSERTION INTO DEPARTMENT TABLE
@@ -221,7 +239,10 @@ insert into Refugee(refugeeID, roomID, homeCountry, countryIssue) values
 ("R002", 2, "Yemen", "Civil War"),
 ("R003", 3, "Syria", "Civil War"),
 ("R004", 4, "India-Mumbai", "Famine"),
-("R005", 4, "Haiti", "Ntural Disasters");
+("R005", 4, "Yemen", "Civil War"),
+("R006", 3, "Yemen", "Civil War"),
+("R007", 3, "Yemen", "Civil War"),
+("R008", 2, "Syria", "Natural Disaster");
 
 --  INSERTION INTO PATIENT TABLE
 insert into Patient(patientID, roomID, illnessStatus, pastHospitalName) values
@@ -248,15 +269,18 @@ insert into Staff_Program(staffID, programID) values
 ("S004", 5),
 ("S005", 1),
 ("S001", 2),
-("S002", 3);
+("S002", 3),
+("S002", 5),
+("S004", 1),
+("S005", 4);
 
 -- INSERTION INTO THE REFUGEE PROGRAM 
 insert into Refugee_Program(refugeeID, programID) values
 ("R001", 6), ("R001", 7), ("R001", 5), ("R002", 6),
 ("R002", 7), ("R002", 5), ("R003", 6), ("R003", 7),
-("R003", 5), ("R004", 6), ("R004", 7), ("R004", 5),
-("R004", 4), ("R005", 6), ("R005", 7), ("R005", 5),
-("R005", 4), ("R001", 4), ("R002", 4), ("R003", 4);
+("R003", 5), ("R004", 6), ("R004", 7), ("R007", 5),
+("R004", 4), ("R005", 6), ("R007", 7), ("R005", 5),
+("R005", 4), ("R006", 4), ("R002", 4), ("R008", 4);
 
 -- INSERTION INTO THE PATIENT PROGRAM 
 insert into Patient_Program(patientID, programID) values
@@ -264,7 +288,7 @@ insert into Patient_Program(patientID, programID) values
 ("P002", 1), ("P002", 2), 
 ("P003", 1), ("P004", 2), 
 ("P004", 1), ("P005", 1),
-("P001", 2);
+("P001", 2), ("P003", 2);
 
 -- INSERTION INTO THE PATIENT PROGRAM 
 insert into Patient_Visitor(patientID, visitorID) values
@@ -272,7 +296,12 @@ insert into Patient_Visitor(patientID, visitorID) values
 ("P002", "V005"),
 ("P004", "V003"),
 ("P005", "V001"),
-("P003", "V002");
+("P003", "V002"),
+("P003", "V001"),
+("P004", "V002"),
+("P005", "V003"),
+("P005", "V002"),
+("P002", "V004");
 
 -- INSERTION INTO THE PATIENT PROGRAM 
 insert into healthRecord values
@@ -282,22 +311,38 @@ insert into healthRecord values
 ("P004", "Trachea, bronchus, and lung cancers", "AB"),
 ("P005", "Alzheimer’s disease", "O");
 
-
 -- CREATING INDEXES
+
+-- creating an index for the names of the programs run by the organization
 create index programs on Program (programName);
 
+-- creating an index for the status of the illness of all the patients in the organization 
 create index patientCondition on Patient (illnessStatus);
 
+-- creating an index for the home countries of the refugees in the organization
+create index home_country on Refugee(homeCountry);
+
+-- creating for all the person groups in the organization
+create index personGroup on Person(personType);  
+
+
 -- QUERY ONE
--- INFORMATION ABOUT ALL REFUGEES
+-- Information about all the refugees in the organization, ranging from their personal information , their home country,
+-- and the phenomena that cowed their movement from their home countries.
+
 select Person.personID as "refugeeID", Room.roomID, Person.lname as "last name", Person.fname as "first name", Person.dateOfBirth,
 	Person.gender, Refugee.homeCountry, Refugee.countryIssue
-	from (Person join Refugee on Person.personID = Refugee.refugeeID)
+	from (Person inner join Refugee on Person.personID = Refugee.refugeeID)
 	join Room on Room.roomID = Refugee.roomID
+    where Refugee.homeCountry = "Yemen"
 order by Refugee.homeCountry;
+
 
 -- QUERY TWO
 -- INFORMATION ABOUT ALL PATIENTS
+-- This retrives the information about all the patients , including their past hospitals 
+-- before they were rehabilitated and their health record
+
 select Person.personID as "patient Identifier", Person.lname as "last name",
 Person.fname as "first name",  Room.roomID, Room.victimTypesContained as "In With", Person.dateOfBirth, Person.gender, Patient.pastHospitalName, 
 healthRecord.bloodGroup, healthRecord.diagnosedOf, Patient.illnessStatus
@@ -306,8 +351,10 @@ join Room on Room.roomID = Patient.roomID
 where Patient.illnessStatus IN ("critical condition", "mild condition")
 order by Patient.pastHospitalName desc;
 
--- QUERY THREE
 
+-- QUERY THREE
+-- This retrives information about the programs run by the organization, and the information about the 
+-- the number of victims(patients and refugees) taking them
 select  Department.departmentID, Department.departmentName, Program.programID, Program.programName as "Program Name" ,
 	(count(Patient_Program.ProgramID) + count(Refugee_Program.refugeeID)) as "Number of Victims Taking Program" from 
 	(Program left join Refugee_Program on Program.programID = Refugee_Program.programID join Department on
@@ -318,6 +365,7 @@ group by Program.programName order by Program.programID ;
 
 
 -- QUERY FOUR
+-- This tracks the visiting activities among visitors and patients in the organization
 select Person.lname, Person.fname, Visitor.visitorID, dateVisited, arrivalTime, departureTime from Person 
 inner join Visitor on Person.personID = Visitor.patientVisitedID inner join Patient on Person.personID = Patient.patientID
 where illnessStatus in (
@@ -327,15 +375,17 @@ where illnessStatus in (
 
 
 -- QUERY FIVE
-select lname, fname, gender, branchName, departmentName, Staff.staffID, count(distinct Staff_Program.staffID, Staff_Program.programID) as 
-"Number of Programs Allocated to Staff" 
-from
-(Staff inner join Person on Person.personID = Staff.staffID inner join Branch on Staff.branchBasedID = Branch.branchID inner join 
-Department on Staff.departmentID = Department.departmentID) join Staff_Program on Staff_Program.staffID = Staff.staffID left join 
+-- This stores information about the staff in the organization, and the number of the programs they coordinate in the entity
+select lname as "Staff Lname", fname as "Staff Fname", gender, branchName as "Branch", departmentName as "Department", Staff.staffID as "ID", 
+count(distinct Staff_Program.staffID, Staff_Program.programID) as "Number of Programs Allocated to Staff" 
+from (Staff inner join Person on Person.personID = Staff.staffID inner join Branch on Staff.branchBasedID = Branch.branchID inner join 
+Department on Staff.departmentID = Department.departmentID) 
+join Staff_Program on Staff_Program.staffID = Staff.staffID left join 
 Program on Program.programID = Staff_Program.programID group by Staff_program.staffID;
 
 
 -- QUERY SIX
+-- This retrieves information about the individual total number of the individual victims accomodated in the organization
 select distinct personType as "People", count(personID) as "Number"
-from Person where personType != "Staff" 
+from Person where personType not in ("Staff","Visitor") 
 group by personType;
